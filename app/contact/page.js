@@ -14,40 +14,30 @@ export default function Contact() {
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState(null);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setStatus("Sending...");
 
-    try {
-      await axios.post(
-        "https://portfolio-app.lndo.site/jsonapi/contact_message/general_inquiry",
-        {
-          data: {
-            type: "contact_message--contact_message",
-            attributes: {
-              subject: "Website Contact Form",
-              name: name,
-              mail: email,
-              message: message,
-            },
-          },
-        },
-        {
-          headers: {
-            "Content-Type": "application/vnd.api+json",
-          },
-        }
-      );
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    const res = await fetch("/api/contact", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, email, message }),
+    });
 
+    const data = await res.json();
+    if (data.success) {
       setStatus("Thank you! Your message has been sent.");
       setName("");
       setEmail("");
       setMessage("");
-    } catch (error) {
-      console.error(error);
-      setStatus("Failed to send message. Please try again.");
+    } else {
+      setStatus("Oops! Something went wrong.");
     }
-  };
+  } catch (err) {
+    setStatus("Oops! Something went wrong.");
+  }
+};
+
 
   return (
     <main className="min-h-screen bg-background text-foreground font-mono flex items-center justify-center p-5">
